@@ -147,6 +147,7 @@ const actors = [{
 
 var i;
 var j;
+var a;
 
 for(i=0;i<deliveries.length;i++)
 {
@@ -167,6 +168,21 @@ for(i=0;i<deliveries.length;i++)
     if(deliveries[i]['distance'] > 25)
     {
       deliveries[i]['price'] = deliveries[i]['price'] * 0.5;
+    }
+    var commission = deliveries[i]['price'] * 0.3;
+    deliveries[i]['commission']['insurance'] = commission / 2;
+    deliveries[i]['commission']['treasury'] = parseInt(deliveries[i]['distance'] / 500) ;
+    deliveries[i]['commission']['convargo']= commission - (deliveries[i]['commission']['treasury'] + deliveries[i]['commission']['insurance']);
+    if(deliveries[i]['options']['deductibleReduction'])
+    {
+      deliveries[i]['commission']['convargo'] = deliveries[i]['commission']['convargo'] - deliveries[i]['volume']*1;
+    }
+    for(a=0; a<actors.length;a++)
+    {
+      if(actors[a]['deliveryId'] == deliveries[i]['id'])
+      {
+
+      }
     }
   }
 }
