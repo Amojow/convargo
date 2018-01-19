@@ -145,6 +145,32 @@ const actors = [{
   }]
 }];
 
+var i;
+var j;
+
+for(i=0;i<deliveries.length;i++)
+{
+  for(j=0;j<truckers.length;j++)
+  {
+    if(truckers[j]['id'] == deliveries[i]['truckerId'])
+    {
+      deliveries[i]['price'] = truckers[j]['pricePerKm'] *  deliveries[i]['distance'] + truckers[j]['pricePerVolume'] * deliveries[i]['volume'];
+    }
+    if(deliveries[i]['distance'] > 5 && deliveries[i]['distance'] < 10)
+    {
+      deliveries[i]['price'] = deliveries[i]['price'] * 0.9;
+    }
+    if(deliveries[i]['distance'] > 10 && deliveries[i]['distance'] < 25)
+    {
+      deliveries[i]['price'] = deliveries[i]['price'] * 0.7;
+    }
+    if(deliveries[i]['distance'] > 25)
+    {
+      deliveries[i]['price'] = deliveries[i]['price'] * 0.5;
+    }
+  }
+}
+
 console.log(truckers);
 console.log(deliveries);
 console.log(actors);
