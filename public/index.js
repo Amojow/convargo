@@ -148,40 +148,84 @@ const actors = [{
 var i;
 var j;
 var a;
+var b;
 
-for(i=0;i<deliveries.length;i++)
+for(i=0;i<deliveries.length;i++)//go through the deliveries list
 {
-  for(j=0;j<truckers.length;j++)
+  //STEP 1
+  for(j=0;j<truckers.length;j++)//go through the trucker 
   {
     if(truckers[j]['id'] == deliveries[i]['truckerId'])
     {
       deliveries[i]['price'] = truckers[j]['pricePerKm'] *  deliveries[i]['distance'] + truckers[j]['pricePerVolume'] * deliveries[i]['volume'];
     }
-    if(deliveries[i]['distance'] > 5 && deliveries[i]['distance'] < 10)
-    {
-      deliveries[i]['price'] = deliveries[i]['price'] * 0.9;
-    }
-    if(deliveries[i]['distance'] > 10 && deliveries[i]['distance'] < 25)
-    {
-      deliveries[i]['price'] = deliveries[i]['price'] * 0.7;
-    }
-    if(deliveries[i]['distance'] > 25)
-    {
-      deliveries[i]['price'] = deliveries[i]['price'] * 0.5;
-    }
-    var commission = deliveries[i]['price'] * 0.3;
-    deliveries[i]['commission']['insurance'] = commission / 2;
-    deliveries[i]['commission']['treasury'] = parseInt(deliveries[i]['distance'] / 500) ;
-    deliveries[i]['commission']['convargo']= commission - (deliveries[i]['commission']['treasury'] + deliveries[i]['commission']['insurance']);
-    if(deliveries[i]['options']['deductibleReduction'])
-    {
-      deliveries[i]['commission']['convargo'] = deliveries[i]['commission']['convargo'] - deliveries[i]['volume']*1;
-    }
-    for(a=0; a<actors.length;a++)
-    {
-      if(actors[a]['deliveryId'] == deliveries[i]['id'])
-      {
+  }
 
+  //STEP 2
+  if(deliveries[i]['distance'] > 5 && deliveries[i]['volume'] < 10)
+  {
+    deliveries[i]['price'] = deliveries[i]['price'] * 0.9;
+  }
+  if(deliveries[i]['distance'] > 10 && deliveries[i]['volume'] < 25)
+  {
+    deliveries[i]['price'] = deliveries[i]['price'] * 0.7;
+  }
+  if(deliveries[i]['volume'] > 25)
+  {
+    deliveries[i]['price'] = deliveries[i]['price'] * 0.5;
+  }
+
+
+  //STEP 3
+  var commission = deliveries[i]['price'] * 0.3;
+  deliveries[i]['commission']['insurance'] = commission / 2;
+  deliveries[i]['commission']['treasury'] = parseInt(deliveries[i]['distance'] / 500)+1 ;
+  deliveries[i]['commission']['convargo']= commission -(deliveries[i]['commission']['treasury'] + deliveries[i]['commission']['insurance']);
+  
+  
+  //STEP 4
+  if(deliveries[i]['options']['deductibleReduction'])
+  {
+    deliveries[i]['commission']['convargo'] = deliveries[i]['commission']['convargo'] + deliveries[i]['volume']*1;
+  }
+
+
+  //STEP 5
+  for(a=0; a<actors.length;a++)//fill actors payment
+  {
+    if(actors[a]['deliveryId'] == deliveries[i]['id'])
+    {
+      for(b=0; b<actors[a]['payment'].length;b++)//browse the list payment
+      {
+      
+        if(actors[a]['payment'][b]['who'] == 'trucker')
+        {
+          actors[a]['payment'][b]['amount'] = deliveries[i]['price'] *0.7;
+        }
+        if(actors[a]['payment'][b]['who'] == 'shipper')
+        {
+          if(deliveries[i]['options']['deductibleReduction'])
+          {
+            actors[a]['payment'][b]['amount'] = deliveries[i]['price']+deliveries[i]['volume'];
+          }
+          else
+          {
+            actors[a]['payment'][b]['amount'] = deliveries[i]['price'];
+          }
+
+        }
+        if(actors[a]['payment'][b]['who'] == 'insurance')
+        {
+          actors[a]['payment'][b]['amount'] = deliveries[i]['commission']['insurance'];
+        }
+        if(actors[a]['payment'][b]['who'] == 'treasury')
+        {
+          actors[a]['payment'][b]['amount'] = deliveries[i]['commission']['treasury'];
+        }
+        if(actors[a]['payment'][b]['who'] == 'convargo')
+        {
+          actors[a]['payment'][b]['amount'] = deliveries[i]['commission']['convargo'];
+        }
       }
     }
   }
